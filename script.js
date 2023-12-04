@@ -50,23 +50,24 @@ function convertTimeStamp(timestamp, timezone){
         timeZone: `Etc/GMT${convertTimezone >= 0 ? "-" : "+"}${Math.abs(convertTimezone)}`,
         hour12: true,
     }
-    return date.toLocaleString("en-US", options)
+    return date.toLocaleString("ro-RO", options)
    
 }
 
  
 function convertCountryCode(country){
-    let regionNames = new Intl.DisplayNames(["en"], {type: "region"});
+    let regionNames = new Intl.DisplayNames(["ro"], {type: "region"});
     return regionNames.of(country)
 }
 
 function getWeather(){
     const API_KEY = '64f60853740a1ee3ba20d0fb595c97d5';
-    const searchUrl = `https://api.openweathermap.org/data/2.5/weather?q=${currCity}&appid=${API_KEY}&units=${units}`
+    const lang = 'ro';
+    const searchUrl = `https://api.openweathermap.org/data/2.5/weather?q=${currCity}&appid=${API_KEY}&units=${units}&lang=${lang}`
     fetch(searchUrl)
     .then(res => {
         if (!res.ok) {
-            throw new Error(`City not found for ${currCity}`);
+            throw new Error(`Orașul ${currCity} nu a fost găsit`);
         }
         return res.json();
     })
@@ -74,7 +75,7 @@ function getWeather(){
     console.log(data)
     city.innerHTML = `${data.name}, ${convertCountryCode(data.sys.country)}`
     datetime.innerHTML = convertTimeStamp(data.dt, data.timezone); 
-    weather__forecast.innerHTML = `<p>${data.weather[0].main}`
+    weather__forecast.innerHTML = `<p>${weatherDescriptions[data.weather[0].main]}</p>`;
     weather__temperature.innerHTML = `${data.main.temp.toFixed()}&#176`
     weather__icon.innerHTML = `   <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png" />`
     weather__minmax.innerHTML = `<p>Min: ${data.main.temp_min.toFixed()}&#176</p><p>Max: ${data.main.temp_max.toFixed()}&#176</p>`
@@ -87,7 +88,7 @@ function getWeather(){
 })
 .catch(error => {
     console.error(error);
-    city.innerHTML = "City not found";
+    city.innerHTML = "Orașul nu a fost găsit";
     weather__realfeel.innerHTML = "";
     weather__humidity.innerHTML = "";
     weather__wind.innerHTML = "";
@@ -97,6 +98,15 @@ function getWeather(){
     weather__temperature.innerHTML = "";
     updateDateTime();
 });
+const weatherDescriptions = {
+    'Clear': 'Senin',
+    'Clouds': 'Înnorat',
+    'Rain': 'Ploaie',
+    'Drizzle': 'Burniță',
+    'Thunderstorm': 'Furtună',
+    "Fog": 'Ceață',
+    "Mist": 'Ceață',
+}
 }
 function updateDateTime() {
     const now = new Date();
@@ -110,7 +120,7 @@ function updateDateTime() {
         timeZone: "UTC",  
         hour12: false,
     };
-    datetime.innerHTML = now.toLocaleString("en-US", options);
+    datetime.innerHTML = now.toLocaleString("ro-RO", options);
 }
 updateDateTime();
 
